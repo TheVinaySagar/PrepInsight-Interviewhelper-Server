@@ -1,25 +1,27 @@
-import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import morgan from 'morgan';
-import dotenv from 'dotenv';
-import mongoose from 'mongoose';
-import awsServerlessExpress from 'aws-serverless-express';
-import { auth } from './config/firebase.js';
-import authRoutes from './routes/authRoutes.js';
-import interviewRoutes from './routes/interviewsRoutes.js';
-import userRoutes from './routes/userRoutes.js';
-import chatRoutes from './routes/chatRoutes.js';
-import commentsRoutes from './routes/commentsRoutes.js';
-import adminRoutes from './routes/adminRoutes.js';
+import awsServerlessExpress from "aws-serverless-express";
+import express from "express";
+import cors from "cors";
+import helmet from "helmet";
+import morgan from "morgan";
+import dotenv from "dotenv";
+import mongoose from "mongoose";
+
+// Import routes
+import { auth } from "./config/firebase.js";
+import authRoutes from "./routes/authRoutes.js";
+import interviewRoutes from "./routes/interviewsRoutes.js";
+import userRoutes from "./routes/usersRoutes.js";
+import chatRoutes from "./routes/chatRoutes.js";
+import commentsRoutes from "./routes/commentsRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 // Load environment variables
 dotenv.config();
 
-// Initialize express app
+// Initialize Express app
 const app = express();
 
-// Database connection with caching
+// Database connection caching
 let cachedDb = null;
 
 async function connectToDatabase() {
@@ -27,9 +29,9 @@ async function connectToDatabase() {
     return cachedDb;
   }
 
-  // MongoDB connection
-  await mongoose.connect(process.env.MONGODB_URI);
-  console.log("Connected to MongoDB");
+  // Connect to MongoDB
+  await mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+  console.log("✅ Connected to MongoDB");
   cachedDb = mongoose;
   return cachedDb;
 }
@@ -37,7 +39,7 @@ async function connectToDatabase() {
 // Middleware
 app.use(cors());
 app.use(helmet());
-app.use(morgan('dev'));
+app.use(morgan("dev"));
 app.use(express.json());
 
 // Routes
@@ -53,16 +55,19 @@ app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok" });
 });
 
-// Initialize the AWS server
+// Create AWS Serverless Express Server
 const server = awsServerlessExpress.createServer(app);
 
-// Handler for AWS Lambda
-export async function handler(event, context) {
+// ✅ Properly handle promise
+export const handler = async (event, context) => {
   context.callbackWaitsForEmptyEventLoop = false;
 
-  // Connect to database (uses cached connection if available)
   await connectToDatabase();
 
-  // Pass the request to the Express application
-  return awsServerlessExpress.proxy(server, event, context, 'PROMISE');
-}
+  return new Promise((resolve, reject) => {
+    awsServerlessExpress.proxy(server, event, {
+      succeed: resolve,
+      fail: reject,
+    });
+  });
+};
