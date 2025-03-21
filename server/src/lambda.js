@@ -1,4 +1,4 @@
-import awsServerlessExpress from "aws-serverless-express";
+import serverlessExpress from "@vendia/serverless-express";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -24,15 +24,17 @@ const app = express();
 let cachedDb = null;
 
 async function connectToDatabase() {
-  if (cachedDb) {
-    return cachedDb;
-  }
+  if (cachedDb) return cachedDb;
 
-  // Connect to MongoDB
-  await mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
-  console.log("✅ Connected to MongoDB");
-  cachedDb = mongoose;
-  return cachedDb;
+  try {
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log("✅ Connected to MongoDB");
+    cachedDb = mongoose;
+    return cachedDb;
+  } catch (error) {
+    console.error("❌ MongoDB Connection Error:", error);
+    throw new Error("Database connection failed");
+  }
 }
 
 // Middleware
@@ -49,24 +51,26 @@ app.use("/api/chat", chatRoutes);
 app.use("/api/comments", commentsRoutes);
 app.use("/api/admin", adminRoutes);
 
+// Add a root route for debugging
+app.get("/", (req, res) => {
+  res.status(200).json({ message: "Server is running!" });
+});
+
 // Health check route
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok" });
 });
 
-// Create AWS Serverless Express Server
-const server = awsServerlessExpress.createServer(app);
-
-// ✅ Properly handle promise
+// AWS Lambda Handler
+let server;
 export const handler = async (event, context) => {
   context.callbackWaitsForEmptyEventLoop = false;
 
   await connectToDatabase();
 
-  return new Promise((resolve, reject) => {
-    awsServerlessExpress.proxy(server, event, {
-      succeed: resolve,
-      fail: reject,
-    });
-  });
+  if (!server) {
+    server = serverlessExpress({ app });
+  }
+
+  return server(event, context);
 };
