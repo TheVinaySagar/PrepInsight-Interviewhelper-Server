@@ -1,11 +1,12 @@
 {
-  "name": "interview-experience-server",
+  "name": "lambda-server",
   "version": "1.0.0",
-  "description": "Backend server for Interview Experience Platform",
-  "main": "index.js",
+  "description": "AWS Lambda Express Server",
+  "main": "src/lambda.js",
+  "type": "commonjs",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
+    "start": "node src/lambda.js",
+    "dev": "nodemon src/lambda.js",
     "deploy": "serverless deploy"
   },
   "dependencies": {

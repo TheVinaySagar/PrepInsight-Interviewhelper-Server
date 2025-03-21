@@ -6,10 +6,12 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const awsServerlessExpress = require('aws-serverless-express');
 const { auth } = require('./config/firebase');
-const authRoutes = require('./routes/auth');
-const interviewRoutes = require('./routes/interviews');
-const userRoutes = require('./routes/users');
-const chatRoutes = require('./routes/chat');
+const authRoutes = require('./routes/authRoutes');
+const interviewRoutes = require('./routes/interviewsRoutes');
+const userRoutes = require('./routes/usersRoutes');
+const chatRoutes = require('./routes/chatRoutes');
+const commentsRoutes = require('./routes/commentsRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 // Load environment variables
 dotenv.config();
