@@ -1,4 +1,4 @@
-import { default as serverlessExpress } from "@vendia/serverless-express"; // Correct import
+import serverlessExpress from '@vendia/serverless-express/middleware'; // Correct import
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -69,7 +69,11 @@ export const handler = async (event, context) => {
   await connectToDatabase();
 
   if (!server) {
-    server = serverlessExpress({ app }); // Correct usage
+    server = serverlessExpress({
+      app,
+      respondWithErrors: process.env.NODE_ENV === 'development',
+      stripBasePath: true
+    });
   }
 
   return server(event, context);
