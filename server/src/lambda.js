@@ -22,6 +22,7 @@ const app = express();
 // Database connection caching
 let cachedDb = null;
 
+
 async function connectToDatabase() {
   if (cachedDb) return cachedDb;
 
@@ -32,10 +33,17 @@ async function connectToDatabase() {
     return cachedDb;
   } catch (error) {
     console.error("MongoDB Connection Error:", error);
-    throw new Error("Database connection failed");
+    throw error; // Rethrow to handle in the initialization
   }
 }
-
+(async () => {
+  try {
+    await connectToDatabase();
+    console.log("Database connection initialized");
+  } catch (error) {
+    console.error("Initial database connection failed:", error);
+  }
+})();
 // Middleware
 app.use(cors());
 app.use(helmet());
