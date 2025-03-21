@@ -61,7 +61,7 @@ app.get("/health", (req, res) => {
 });
 
 // AWS Lambda Handler
-module.exports.handler = serverless(app);
+export default serverless(app);
 // let server;
 // export const handler = async (event, context) => {
 //   context.callbackWaitsForEmptyEventLoop = false;
