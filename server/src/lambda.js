@@ -7,10 +7,9 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 
 // Import routes
-import { auth } from "./config/firebase.js";
 import authRoutes from "./routes/authRoutes.js";
 import interviewRoutes from "./routes/interviewsRoutes.js";
-import userRoutes from "./routes/usersRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import commentsRoutes from "./routes/commentsRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
