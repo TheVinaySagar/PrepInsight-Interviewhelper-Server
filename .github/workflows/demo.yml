@@ -33,11 +33,10 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
-      - name: Package for Lambda
+      - name: Upload ZIP to S3
         run: |
-          cd server
-          zip -r deploy.zip .  # Ensure the zip file is created inside /server
+          aws s3 cp server/deploy.zip s3://your-bucket-name/deploy.zip
 
-      - name: Deploy to AWS Lambda
+      - name: Deploy to AWS Lambda from S3
         run: |
-          aws lambda update-function-code --function-name interviewsite --zip-file fileb://server/deploy.zip
+          aws lambda update-function-code --function-name interviewsite --s3-bucket bucket-vinay1 --s3-key deploy.zip
