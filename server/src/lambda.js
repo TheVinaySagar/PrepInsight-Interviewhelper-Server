@@ -31,7 +31,7 @@ async function connectToDatabase() {
     cachedDb = mongoose;
     return cachedDb;
   } catch (error) {
-    console.error("❌ MongoDB Connection Error:", error);
+    console.error("MongoDB Connection Error:", error);
     throw new Error("Database connection failed");
   }
 }
