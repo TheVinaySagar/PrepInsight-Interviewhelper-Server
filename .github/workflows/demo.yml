@@ -28,10 +28,15 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
+          
+      - name: Package for Lambda
+        run: |
+          cd server
+          zip -r deploy.zip .
 
       - name: Upload ZIP to S3
         run: |
-          aws s3 cp server/deploy.zip s3://your-bucket-name/deploy.zip
+          aws s3 cp server/deploy.zip s3://bucket-vinay1/deploy.zip
 
       - name: Deploy to AWS Lambda from S3
         run: |
