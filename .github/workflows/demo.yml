@@ -1,3 +1,10 @@
+name: Deploy AWS Lambda
+
+on:
+  push:
+    branches:
+      - test  # Triggers workflow on push to the "test" branch
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,7 +20,7 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-        working-directory: server  # Navigate to /server
+        working-directory: server  # Ensure the command runs inside /server
 
       - name: Build the project (if applicable)
         run: npm run build
@@ -27,8 +34,10 @@ jobs:
           aws-region: ap-south-1
 
       - name: Package for Lambda
-        run: zip -r deploy.zip .
-        working-directory: server
+        run: |
+          cd server
+          zip -r deploy.zip .  # Ensure the zip file is created inside /server
 
       - name: Deploy to AWS Lambda
-        run: aws lambda update-function-code --function-name=interviewsite --zip-file=fileb://server/deploy.zip
+        run: |
+          aws lambda update-function-code --function-name interviewsite --zip-file fileb://server/deploy.zip
