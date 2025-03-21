@@ -1,11 +1,10 @@
-import serverlessExpress from '@vendia/serverless-express/middleware'; // Correct import
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-
+import serverless from "serverless-http";
 // Import routes
 import authRoutes from "./routes/authRoutes.js";
 import interviewRoutes from "./routes/interviewsRoutes.js";
@@ -62,19 +61,20 @@ app.get("/health", (req, res) => {
 });
 
 // AWS Lambda Handler
-let server;
-export const handler = async (event, context) => {
-  context.callbackWaitsForEmptyEventLoop = false;
+module.exports.handler = serverless(app);
+// let server;
+// export const handler = async (event, context) => {
+//   context.callbackWaitsForEmptyEventLoop = false;
 
-  await connectToDatabase();
+//   await connectToDatabase();
 
-  if (!server) {
-    server = serverlessExpress({
-      app,
-      respondWithErrors: process.env.NODE_ENV === 'development',
-      stripBasePath: true
-    });
-  }
+//   if (!server) {
+//     server = serverlessExpress({
+//       app,
+//       respondWithErrors: process.env.NODE_ENV === 'development',
+//       stripBasePath: true
+//     });
+//   }
 
-  return server(event, context);
-};
+//   return server(event, context);
+// };
