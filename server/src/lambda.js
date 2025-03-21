@@ -48,6 +48,14 @@ app.use(helmet());
 app.use(morgan("dev"));
 app.use(express.json());
 
+app.use((req, res, next) => {
+  // Remove stage prefix from path
+  if (req.url.startsWith('/dev/')) {
+    req.url = req.url.substring('/dev'.length);
+  }
+  next();
+});
+
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/interviews", interviewRoutes);
