@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "AWS Lambda Express Server",
   "main": "src/lambda.js",
-  "type": "commonjs",
+  "type": "module",
   "scripts": {
     "start": "node src/lambda.js",
     "dev": "nodemon src/lambda.js",

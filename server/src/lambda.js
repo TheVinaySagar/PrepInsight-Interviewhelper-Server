@@ -1,17 +1,17 @@
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const morgan = require('morgan');
-const dotenv = require('dotenv');
-const mongoose = require('mongoose');
-const awsServerlessExpress = require('aws-serverless-express');
-const { auth } = require('./config/firebase');
-const authRoutes = require('./routes/authRoutes');
-const interviewRoutes = require('./routes/interviewsRoutes');
-const userRoutes = require('./routes/usersRoutes');
-const chatRoutes = require('./routes/chatRoutes');
-const commentsRoutes = require('./routes/commentsRoutes');
-const adminRoutes = require('./routes/adminRoutes');
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import dotenv from 'dotenv';
+import mongoose from 'mongoose';
+import awsServerlessExpress from 'aws-serverless-express';
+import { auth } from './config/firebase.js';
+import authRoutes from './routes/authRoutes.js';
+import interviewRoutes from './routes/interviewsRoutes.js';
+import userRoutes from './routes/usersRoutes.js';
+import chatRoutes from './routes/chatRoutes.js';
+import commentsRoutes from './routes/commentsRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 
 // Load environment variables
 dotenv.config();
@@ -57,8 +57,7 @@ app.get("/health", (req, res) => {
 const server = awsServerlessExpress.createServer(app);
 
 // Handler for AWS Lambda
-exports.handler = async (event, context) => {
-  // Keep the connection alive between invocations
+export async function handler(event, context) {
   context.callbackWaitsForEmptyEventLoop = false;
 
   // Connect to database (uses cached connection if available)
@@ -66,4 +65,4 @@ exports.handler = async (event, context) => {
 
   // Pass the request to the Express application
   return awsServerlessExpress.proxy(server, event, context, 'PROMISE');
-};
+}
