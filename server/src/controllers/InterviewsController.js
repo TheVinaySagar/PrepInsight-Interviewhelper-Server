@@ -280,12 +280,22 @@ class InterviewsController {
       }
 
       // Ensure `questions` is correctly structured
-      if (!Array.isArray(questions) || !questions.every(q => q.question && q.answer)) {
+      if (
+        questions !== undefined && // Allow `questions` to be optional
+        (!Array.isArray(questions) ||
+          !questions.every(q =>
+            typeof q === "object" &&
+            ("question" in q && "answer" in q) && // Ensure both fields exist
+            (q.question.trim() !== "" || q.answer.trim() !== "") // Allow empty objects but reject fully empty ones
+          ))
+      ) {
         return res.status(400).json({
-          message: "Invalid questions format. Each question must have a 'question' and 'answer' field.",
+          message: "Invalid questions format. Each question must have a 'question' and 'answer' field, and at least one must be non-empty.",
           received: questions
-        })
+        });
       }
+
+
 
       // Create new interview document
       const newInterview = new Interview({
