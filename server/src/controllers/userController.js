@@ -199,6 +199,46 @@ class UserController {
       photoURL: req.user.photoURL,
     });
   }
+
+  static async stats(req, res) {
+    try {
+      const userId = req.user.uid;
+
+      // Count number of interviews posted by the user
+      const interviewCount = await Interview.countDocuments({ authorId: userId });
+
+      // Aggregate total likes from user's interviews
+      const totalLikes = await Interview.aggregate([
+        { $match: { authorId: userId } },
+        { $group: { _id: null, total: { $sum: "$likes" } } },
+      ]);
+
+      // Aggregate total comments from user's interviews
+      const totalComments = await Interview.aggregate([
+        { $match: { authorId: userId } },
+        { $group: { _id: null, total: { $sum: "$comments" } } },
+      ]);
+
+      // Fetch user to get the joining date
+      const user = await User.findOne({ uid: userId });
+
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      return res.status(200).json({
+        interviewCount,
+        totalLikes: totalLikes.length > 0 ? totalLikes[0].total : 0,
+        totalComments: totalComments.length > 0 ? totalComments[0].total : 0,
+        memberSince: user.createdAt,
+      });
+
+    } catch (error) {
+      console.error("Fetch user stats error:", error);
+      return res.status(500).json({ message: "Failed to fetch user stats" });
+    }
+  }
+
 }
 
 export default UserController;
