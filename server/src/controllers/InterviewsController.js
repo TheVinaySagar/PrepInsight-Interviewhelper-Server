@@ -86,11 +86,6 @@ class InterviewsController {
 
       let trendingInterviews = await Interview.aggregate([
         {
-          $match: {
-            createdAt: { $gte: thirtyDaysAgo }
-          }
-        },
-        {
           $addFields: {
             trendingScore: {
               $add: [
