@@ -1,5 +1,5 @@
 import express from "express";
-import cors from "cors";
+// import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import dotenv from "dotenv";
@@ -12,6 +12,7 @@ import userRoutes from "./routes/userRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import commentsRoutes from "./routes/commentsRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import corsMiddleware from "./config/cors.js"
 
 // Load environment variables
 dotenv.config();
@@ -43,7 +44,7 @@ async function connectToDatabase() {
   }
 })();
 // Middleware
-app.use(cors());
+app.use(corsMiddleware);
 app.use(helmet());
 app.use(morgan("dev"));
 app.use(express.json());
