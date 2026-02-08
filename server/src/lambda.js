@@ -106,5 +106,23 @@ app.use((err, req, res, next) => {
   }
 });
 
-// AWS Lambda Handler
-export const handler = serverless(app);
+// AWS Lambda Handler with CORS wrapper
+const serverlessHandler = serverless(app);
+
+export const handler = async (event, context) => {
+  const response = await serverlessHandler(event, context);
+  
+  // Get the request origin
+  const origin = event.headers?.origin || event.headers?.Origin || '';
+  
+  // Ensure CORS headers are always present in the Lambda response
+  response.headers = {
+    ...response.headers,
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Credentials': 'true',
+    'Access-Control-Allow-Headers': 'Content-Type,Authorization,X-Requested-With,Accept,Origin',
+    'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS,PATCH'
+  };
+  
+  return response;
+};

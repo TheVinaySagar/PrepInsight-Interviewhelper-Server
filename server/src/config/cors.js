@@ -5,7 +5,8 @@ const allowedOrigins = [
   'http://localhost:3001', // Alternative local development
   'http://localhost:5173', // Vite dev server
   'http://127.0.0.1:3000', // Local IP variant
-  "https://www.interviewstories.in"
+  "https://www.interviewstories.in",
+  "https://interviewstories.in"
 ];
 
 const corsOptions = {
@@ -22,16 +23,13 @@ const corsOptions = {
     if (allowedOrigins.includes(origin)) {
       console.log('CORS: Allowing whitelisted origin:', origin);
       callback(null, true);
+    } else if (origin.includes('.amplifyapp.com') || origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      // Allow Amplify preview/branch deployments and local dev
+      console.log('CORS: Allowing origin:', origin);
+      callback(null, true);
     } else {
-      // For development, allow all localhost and 127.0.0.1 origins
-      const isDevelopment = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
-      if (isDevelopment && (origin.includes('localhost') || origin.includes('127.0.0.1'))) {
-        console.log('CORS: Allowing localhost origin in development:', origin);
-        callback(null, true);
-      } else {
-        console.log('CORS: Rejecting origin:', origin);
-        callback(new Error('Not allowed by CORS'));
-      }
+      console.log('CORS: Rejecting origin:', origin);
+      callback(new Error('Not allowed by CORS'));
     }
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
