@@ -45,9 +45,17 @@ async function connectToDatabase() {
 })();
 // Middleware
 app.use(corsMiddleware);
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 app.use(morgan("dev"));
 app.use(express.json());
+
+// Add CORS debugging middleware
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url} - Origin: ${req.headers.origin || 'no-origin'}`);
+  next();
+});
 
 app.use((req, res, next) => {
   // Remove stage prefix from path
@@ -73,6 +81,29 @@ app.get("/", (req, res) => {
 // Health check route
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok" });
+});
+
+// CORS test route
+app.get("/api/test-cors", (req, res) => {
+  res.status(200).json({ 
+    message: "CORS is working!", 
+    origin: req.headers.origin || "no-origin",
+    method: req.method 
+  });
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Error:', err.message);
+  if (err.message === 'Not allowed by CORS') {
+    res.status(403).json({
+      error: 'CORS Error',
+      message: 'Origin not allowed',
+      origin: req.headers.origin || 'no-origin'
+    });
+  } else {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 // AWS Lambda Handler
